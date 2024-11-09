@@ -5,6 +5,12 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 1.3.1 - 2024-11-09
+
+### Fixed
+
+- Added missing pedestal interceptor dependencies.
+
 ## 1.3.0 - 2024-11-09
 
 ### Fixed
