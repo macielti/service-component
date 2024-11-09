@@ -5,11 +5,17 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 0.3.0 - 2024-11-09
+
+### Added
+
+- Added body request schema validation.
+
 ## 0.2.0 - 2024-11-08
 
 ### Added
 
-- Add default interceptors to the service component.
+- Added default interceptors to the service component.
 
 ## 0.1.0 - 2024-11-08
 

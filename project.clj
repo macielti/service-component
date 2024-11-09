@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/service-component "0.2.0"
+(defproject net.clojars.macielti/service-component "0.3.0"
 
   :description "Service Component is a Pedestal service Integrant component"
 
@@ -11,6 +11,7 @@
                  [io.pedestal/pedestal.service "0.5.10"]
                  [io.pedestal/pedestal.jetty "0.5.10"]
                  [org.clojure/tools.logging "1.3.0"]
+                 [siili/humanize "0.1.1"]
                  [integrant "0.13.1"]]
 
   :profiles {:dev {:resource-paths ^:replace ["test/resources"]
