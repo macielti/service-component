@@ -1,15 +1,15 @@
 (ns service-component-test
   (:require [cheshire.core :as json]
-            [clojure.test :refer :all]
-            [integrant.core :as ig]
-            [schema.test :as s]
-            [io.pedestal.test :as test]
-            [matcher-combinators.test :refer [match?]]
+            [clojure.test :refer [is testing]]
             [common-clj.integrant-components.config :as component.config]
             [common-clj.integrant-components.routes :as component.routes]
-            [service-component.interceptors :as interceptors]
+            [integrant.core :as ig]
+            [io.pedestal.test :as test]
+            [matcher-combinators.test :refer [match?]]
+            [schema.core :as schema]
+            [schema.test :as s]
             [service-component.core :as component.service]
-            [schema.core :as schema]))
+            [service-component.interceptors :as interceptors]))
 
 (def routes [["/test" :get [(fn [{{:keys [config]} :components}]
                               {:status 200
@@ -39,7 +39,13 @@
 
     (testing "That we can't fetch the test endpoint without a valid schema"
       (is (match? {:status 422
-                   :body   "{\"error\":\"invalid-params\"}"}
+                   :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":{\"test\":\"missing-required-key\"}}"}
+                  (test/response-for service-fn :post "/schema-validation-interceptor-test"
+                                     :headers {"Content-Type" "application/json"}
+                                     :body (json/encode {}))))
+
+      (is (match? {:status 422
+                   :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":null}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test")))
 
       (is (match? {:status 200

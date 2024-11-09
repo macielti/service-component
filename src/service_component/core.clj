@@ -1,9 +1,8 @@
 (ns service-component.core
-  (:require
-   [clojure.tools.logging :as log]
-   [integrant.core :as ig]
-   [io.pedestal.http :as http]
-   [service-component.interceptors :as io.interceptors]))
+  (:require [clojure.tools.logging :as log]
+            [integrant.core :as ig]
+            [io.pedestal.http :as http]
+            [service-component.interceptors :as io.interceptors]))
 
 (defmethod ig/init-key ::service
   [_ {:keys [components]}]

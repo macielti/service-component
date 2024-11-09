@@ -1,32 +1,50 @@
 (ns service-component.interceptors
-  (:require [io.pedestal.http :as http]
+  (:require [clojure.tools.logging :as log]
+            [humanize.schema :as h]
+            [io.pedestal.http :as http]
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.interceptor :as pedestal.interceptor]
-            [schema.core :as s])
+            [io.pedestal.interceptor.error :as error]
+            [schema.core :as s]
+            [service-component.error :as common-error])
   (:import (clojure.lang ExceptionInfo)))
+
+#_{:clj-kondo/ignore [:unresolved-symbol]}
+(def error-handler-interceptor
+  (error/error-dispatch [ctx ex]
+                        [{:exception-type :clojure.lang.ExceptionInfo}]
+                        (let [{:keys [status error message detail]} (ex-data ex)]
+                          (assoc ctx :response {:status status
+                                                :body   {:error   error
+                                                         :message message
+                                                         :detail  detail}}))
+
+                        :else
+                        (do (log/error ex)
+                            (assoc ctx :response {:status 500 :body {:error   "unexpected-server-error"
+                                                                     :message "Internal Server Error"
+                                                                     :detail  "Internal Server Error"}}))))
 
 (defn components-interceptor [system-components]
   (pedestal.interceptor/interceptor
-    {:name  ::components-interceptor
-     :enter (fn [context]
-              (assoc-in context [:request :components] system-components))}))
+   {:name  ::components-interceptor
+    :enter (fn [context]
+             (assoc-in context [:request :components] system-components))}))
 
 (defn default-interceptors [components]
   [(body-params/body-params)
    (components-interceptor components)
-   http/json-body])
+   http/json-body
+   error-handler-interceptor])
 
 (defn schema-body-in-interceptor [schema]
-  (pedestal.interceptor/interceptor
-    {:name  ::schema-body-in-interceptor
-     :enter (fn [{{:keys [json-params]} :request :as context}]
-              (let [validation-result (try (s/validate schema json-params)
-                                           (catch ExceptionInfo e
-                                             (when (= (:type (ex-data e)) :schema.core/error)
-                                               {:status  422
-                                                :headers {}
-                                                :body    {:error "invalid-params"}})))]
-                (if (and (= "invalid-params" (get-in validation-result [:body :error]))
-                         (= 422 (:status validation-result)))
-                  (assoc context :response validation-result)
-                  context)))}))
+  (pedestal.interceptor/interceptor {:name  ::schema-body-in-interceptor
+                                     :enter (fn [{{:keys [json-params]} :request :as context}]
+                                              (try (s/validate schema json-params)
+                                                   (catch ExceptionInfo e
+                                                     (when (= (:type (ex-data e)) :schema.core/error)
+                                                       (common-error/http-friendly-exception 422
+                                                                                             "invalid-schema-in"
+                                                                                             "The system detected that the received data is invalid"
+                                                                                             (get-in (h/ex->err e) [:unknown :error])))))
+                                              context)}))

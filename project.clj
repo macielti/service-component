@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/service-component "0.3.0"
+(defproject net.clojars.macielti/service-component "1.3.0"
 
   :description "Service Component is a Pedestal service Integrant component"
 

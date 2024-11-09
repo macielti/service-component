@@ -5,6 +5,12 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 1.3.0 - 2024-11-09
+
+### Fixed
+
+- Fixed error handling interceptors.
+
 ## 0.3.0 - 2024-11-09
 
 ### Added
