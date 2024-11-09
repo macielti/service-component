@@ -21,7 +21,10 @@
                                     [com.github.clojure-lsp/lein-clojure-lsp "1.4.13"]
                                     [com.github.liquidz/antq "RELEASE"]]
 
-                   :dependencies   [[hashp "0.2.2"]]
+                   :dependencies   [[net.clojars.macielti/common-clj "37.71.70"]
+                                    [prismatic/schema "1.4.1"]
+                                    [nubank/matcher-combinators "3.9.1"]
+                                    [hashp "0.2.2"]]
 
                    :injections     [(require 'hashp.core)]
 
