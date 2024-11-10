@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/service-component "1.3.1"
+(defproject net.clojars.macielti/service-component "1.3.2"
 
   :description "Service Component is a Pedestal service Integrant component"
 
@@ -8,9 +8,9 @@
             :url  "https://www.eclipse.org/legal/epl-2.0/"}
 
   :dependencies [[org.clojure/clojure "1.12.0"]
-                 [io.pedestal/pedestal.service "0.5.10"]
-                 [io.pedestal/pedestal.jetty "0.5.10"]
-                 [io.pedestal/pedestal.interceptor "0.5.10"]
+                 [io.pedestal/pedestal.service "0.7.2"]
+                 [io.pedestal/pedestal.jetty "0.7.2"]
+                 [io.pedestal/pedestal.error "0.7.2"]
                  [org.clojure/tools.logging "1.3.0"]
                  [siili/humanize "0.1.1"]
                  [integrant "0.13.1"]]

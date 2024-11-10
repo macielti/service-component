@@ -2,6 +2,16 @@
 
 Service Component is a Pedestal service Integrant component.
 
+If you will be using this library in a project intended to be compiled using GraalVM, you should add the following
+dependencies to your project:
+
+``` clojure
+  [net.clojars.macielti/service-component "1.3.1.3"]
+  [io.pedestal/pedestal.service "0.7.2"]
+  [io.pedestal/pedestal.jetty "0.7.2"]
+  [io.pedestal/pedestal.error "0.7.2"]
+```
+
 ## License
 
 Copyright © 2024 Bruno do Nascimento Maciel

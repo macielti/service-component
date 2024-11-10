@@ -5,6 +5,12 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 1.3.2 - 2024-11-09
+
+### Added
+
+- Bump Pedestal version to 0.7.2.
+
 ## 1.3.1 - 2024-11-09
 
 ### Fixed
