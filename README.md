@@ -1,3 +1,6 @@
+![Compatible with GraalVM](https://img.shields.io/badge/compatible_with-GraalVM-green)
+
+
 # Service Component
 
 Service Component is a Pedestal service Integrant component.
