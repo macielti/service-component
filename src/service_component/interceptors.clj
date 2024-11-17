@@ -1,6 +1,7 @@
 (ns service-component.interceptors
   (:require [clojure.tools.logging :as log]
             [humanize.schema :as h]
+            [iapetos.core :as prometheus]
             [io.pedestal.http :as http]
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.interceptor :as pedestal.interceptor]
@@ -48,3 +49,20 @@
                                                                                              "The system detected that the received data is invalid"
                                                                                              (get-in (h/ex->err e) [:unknown :error])))))
                                               context)}))
+
+(def http-request-in-handle-timing-interceptor
+  (pedestal.interceptor/interceptor
+   {:name  ::http-request-in-handle-timing
+    :enter (fn [context]
+             (assoc context ::start-ms (System/currentTimeMillis)))
+    :leave (fn [{{:keys [components]} :request :as context}]
+             (let [{::keys [start-ms]} context
+                   prometheus-registry (get-in components [:prometheus :registry])
+                   service-name (get-in components [:config :service-name])
+                   elapsed-ms (- (System/currentTimeMillis) start-ms)
+                   route-name (get-in context [:route :route-name])]
+               (prometheus/observe prometheus-registry :http-request-in-handle-timing
+                                   {:service  (name service-name)
+                                    :endpoint (name route-name)}
+                                   elapsed-ms)
+               (dissoc context ::start-ms)))}))

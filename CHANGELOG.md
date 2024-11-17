@@ -5,6 +5,12 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 1.4.2 - 2024-11-16
+
+### Added
+
+- Added `service-component.interceptors/http-request-in-handle-timing-interceptor` interceptor.
+
 ## 1.3.2 - 2024-11-10
 
 ### Added

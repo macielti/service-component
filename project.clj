@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/service-component "1.3.2"
+(defproject net.clojars.macielti/service-component "1.4.2"
 
   :description "Service Component is a Pedestal service Integrant component"
 
@@ -12,6 +12,7 @@
                  [io.pedestal/pedestal.jetty "0.7.2"]
                  [io.pedestal/pedestal.error "0.7.2"]
                  [org.clojure/tools.logging "1.3.0"]
+                 [clj-commons/iapetos "0.1.14"]             ;;TODO Use prometheus-component dependency instead of iapetos
                  [siili/humanize "0.1.1"]
                  [integrant "0.13.1"]]
 
@@ -23,9 +24,10 @@
                                     [com.github.clojure-lsp/lein-clojure-lsp "1.4.13"]
                                     [com.github.liquidz/antq "RELEASE"]]
 
-                   :dependencies   [[net.clojars.macielti/common-clj "37.71.70"]
+                   :dependencies   [[net.clojars.macielti/common-clj "38.72.71"]
                                     [prismatic/schema "1.4.1"]
                                     [nubank/matcher-combinators "3.9.1"]
+                                    [com.taoensso/timbre "6.6.1"]
                                     [hashp "0.2.2"]]
 
                    :injections     [(require 'hashp.core)]

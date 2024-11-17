@@ -1,8 +1,11 @@
 (ns service-component-test
   (:require [cheshire.core :as json]
+            [clojure.string :as str]
             [clojure.test :refer [is testing]]
             [common-clj.integrant-components.config :as component.config]
+            [common-clj.integrant-components.prometheus :as component.prometheus]
             [common-clj.integrant-components.routes :as component.routes]
+            [iapetos.export :as export]
             [integrant.core :as ig]
             [io.pedestal.test :as test]
             [matcher-combinators.test :refer [match?]]
@@ -11,7 +14,8 @@
             [service-component.core :as component.service]
             [service-component.interceptors :as interceptors]))
 
-(def routes [["/test" :get [(fn [{{:keys [config]} :components}]
+(def routes [["/test" :get [interceptors/http-request-in-handle-timing-interceptor
+                            (fn [{{:keys [config]} :components}]
                               {:status 200
                                :body   config})]
               :route-name :test]
@@ -22,15 +26,18 @@
               :route-name :schema-validation-interceptor-test]])
 
 (def system-components
-  {::component.config/config   {:path "test/resources/config.example.edn"
-                                :env  :test}
-   ::component.routes/routes   {:routes routes}
-   ::component.service/service {:components {:config (ig/ref ::component.config/config)
-                                             :routes (ig/ref ::component.routes/routes)}}})
+  {::component.config/config         {:path "test/resources/config.example.edn"
+                                      :env  :test}
+   ::component.routes/routes         {:routes routes}
+   ::component.prometheus/prometheus {:metrics []}
+   ::component.service/service       {:components {:config     (ig/ref ::component.config/config)
+                                                   :prometheus (ig/ref ::component.prometheus/prometheus)
+                                                   :routes     (ig/ref ::component.routes/routes)}}})
 
 (s/deftest service-component-test
   (let [system (ig/init system-components)
-        service-fn (-> system ::component.service/service :io.pedestal.http/service-fn)]
+        service-fn (-> system ::component.service/service :io.pedestal.http/service-fn)
+        prometheus-registry (-> system ::component.prometheus/prometheus :registry)]
 
     (testing "That we can fetch the test endpoint and access components from the request"
       (is (match? {:status 200
@@ -53,5 +60,7 @@
                   (test/response-for service-fn :post "/schema-validation-interceptor-test"
                                      :headers {"Content-Type" "application/json"}
                                      :body (json/encode {:test :ok})))))
+
+    (is (str/includes? (export/text-format prometheus-registry) "default_http_request_in_handle_timing_bucket{service=\"rango\",endpoint=\"test\""))
 
     (ig/halt! system)))
