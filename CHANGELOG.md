@@ -5,6 +5,12 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 2.4.2 - 2024-11-17
+
+### Fixed
+
+- Use `:http-request-in-handle-timing-v2` metric.
+
 ## 1.4.2 - 2024-11-16
 
 ### Added

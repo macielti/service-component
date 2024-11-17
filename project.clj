@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/service-component "1.4.2"
+(defproject net.clojars.macielti/service-component "2.4.2"
 
   :description "Service Component is a Pedestal service Integrant component"
 
@@ -21,10 +21,10 @@
                    :test-paths     ^:replace ["test/unit" "test/integration" "test/helpers"]
 
                    :plugins        [[lein-cloverage "1.2.4"]
-                                    [com.github.clojure-lsp/lein-clojure-lsp "1.4.13"]
+                                    [com.github.clojure-lsp/lein-clojure-lsp "1.4.15"]
                                     [com.github.liquidz/antq "RELEASE"]]
 
-                   :dependencies   [[net.clojars.macielti/common-clj "38.72.71"]
+                   :dependencies   [[net.clojars.macielti/common-clj "39.72.72"]
                                     [prismatic/schema "1.4.1"]
                                     [nubank/matcher-combinators "3.9.1"]
                                     [com.taoensso/timbre "6.6.1"]

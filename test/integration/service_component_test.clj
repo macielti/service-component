@@ -61,6 +61,6 @@
                                      :headers {"Content-Type" "application/json"}
                                      :body (json/encode {:test :ok})))))
 
-    (is (str/includes? (export/text-format prometheus-registry) "default_http_request_in_handle_timing_bucket{service=\"rango\",endpoint=\"test\""))
+    (is (str/includes? (export/text-format prometheus-registry) "http_request_in_handle_timing_v2_sum{service=\"rango\",endpoint=\"test\",}"))
 
     (ig/halt! system)))

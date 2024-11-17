@@ -28,9 +28,9 @@
 
 (defn components-interceptor [system-components]
   (pedestal.interceptor/interceptor
-   {:name  ::components-interceptor
-    :enter (fn [context]
-             (assoc-in context [:request :components] system-components))}))
+    {:name  ::components-interceptor
+     :enter (fn [context]
+              (assoc-in context [:request :components] system-components))}))
 
 (defn default-interceptors [components]
   [(body-params/body-params)
@@ -52,17 +52,17 @@
 
 (def http-request-in-handle-timing-interceptor
   (pedestal.interceptor/interceptor
-   {:name  ::http-request-in-handle-timing
-    :enter (fn [context]
-             (assoc context ::start-ms (System/currentTimeMillis)))
-    :leave (fn [{{:keys [components]} :request :as context}]
-             (let [{::keys [start-ms]} context
-                   prometheus-registry (get-in components [:prometheus :registry])
-                   service-name (get-in components [:config :service-name])
-                   elapsed-ms (- (System/currentTimeMillis) start-ms)
-                   route-name (get-in context [:route :route-name])]
-               (prometheus/observe prometheus-registry :http-request-in-handle-timing
-                                   {:service  (name service-name)
-                                    :endpoint (name route-name)}
-                                   elapsed-ms)
-               (dissoc context ::start-ms)))}))
+    {:name  ::http-request-in-handle-timing
+     :enter (fn [context]
+              (assoc context ::start-ms (System/currentTimeMillis)))
+     :leave (fn [{{:keys [components]} :request :as context}]
+              (let [{::keys [start-ms]} context
+                    prometheus-registry (get-in components [:prometheus :registry])
+                    service-name (get-in components [:config :service-name])
+                    elapsed-ms (- (System/currentTimeMillis) start-ms)
+                    route-name (get-in context [:route :route-name])]
+                (prometheus/observe prometheus-registry :http-request-in-handle-timing-v2
+                                    {:service  (name service-name)
+                                     :endpoint (name route-name)}
+                                    elapsed-ms)
+                (dissoc context ::start-ms)))}))
