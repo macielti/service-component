@@ -1,5 +1,5 @@
+[![Clojars Project](https://img.shields.io/clojars/v/net.clojars.macielti/service-component.svg)](https://clojars.org/net.clojars.macielti/service-component)
 ![Compatible with GraalVM](https://img.shields.io/badge/compatible_with-GraalVM-green)
-
 
 # Service Component
 
@@ -9,7 +9,7 @@ If you will be using this library in a project intended to be compiled using Gra
 dependencies to your project:
 
 ``` clojure
-  [net.clojars.macielti/service-component "1.3.1.3"]
+  [net.clojars.macielti/service-component "x.y.z"]
   [io.pedestal/pedestal.service "0.7.2"]
   [io.pedestal/pedestal.jetty "0.7.2"]
   [io.pedestal/pedestal.error "0.7.2"]
