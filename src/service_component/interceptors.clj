@@ -8,6 +8,7 @@
             [io.pedestal.interceptor.error :as error]
             [schema.coerce :as coerce]
             [schema.core :as s]
+            [schema.utils]
             [service-component.error :as common-error])
   (:import (clojure.lang ExceptionInfo)))
 
