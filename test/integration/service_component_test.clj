@@ -19,7 +19,8 @@
                               {:status 200
                                :body   config})]
               :route-name :test]
-             ["/schema-validation-interceptor-test" :post [(interceptors/schema-body-in-interceptor {:test schema/Str})
+             ["/schema-validation-interceptor-test" :post [(interceptors/schema-body-in-interceptor {:test                       schema/Str
+                                                                                                     (schema/optional-key :type) schema/Keyword})
                                                            (fn [_]
                                                              {:status 200
                                                               :body   {:test :schema-ok}})]
@@ -46,20 +47,27 @@
 
     (testing "That we can't fetch the test endpoint without a valid schema"
       (is (match? {:status 422
-                   :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":{\"test\":\"missing-required-key\"}}"}
+                   :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":{\"test\":\"Missing required key\"}}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test"
                                      :headers {"Content-Type" "application/json"}
                                      :body (json/encode {}))))
 
       (is (match? {:status 422
-                   :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":null}"}
+                   :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":\"The value must be a map, but was '' instead.\"}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test")))
 
       (is (match? {:status 200
                    :body   "{\"test\":\"schema-ok\"}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test"
                                      :headers {"Content-Type" "application/json"}
-                                     :body (json/encode {:test :ok})))))
+                                     :body (json/encode {:test :ok}))))
+
+      (is (match? {:status 200
+                   :body   "{\"test\":\"schema-ok\"}"}
+                  (test/response-for service-fn :post "/schema-validation-interceptor-test"
+                                     :headers {"Content-Type" "application/json"}
+                                     :body (json/encode {:test :ok
+                                                         :type :simple-test})))))
 
     (is (str/includes? (export/text-format prometheus-registry) "http_request_in_handle_timing_v2_sum{service=\"rango\",endpoint=\"test\",}"))
 

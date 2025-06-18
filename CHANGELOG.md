@@ -5,6 +5,12 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 3.4.2 - 2025-06-17
+
+### Added
+
+- Apply schema coercion with in `schema-body-in-interceptor`.
+
 ## 2.4.2 - 2024-11-17
 
 ### Fixed
