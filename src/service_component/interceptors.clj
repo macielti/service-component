@@ -57,8 +57,8 @@
                                                                                         "invalid-schema-in"
                                                                                         "The system detected that the received data is invalid"
                                                                                         (-> (schema.utils/error-val coercion-result)
-                                                                                            h/explain))))
-                                              context)}))
+                                                                                            h/explain)))
+                                                (assoc-in context [:request :json-params] coercion-result)))}))
 
 (def http-request-in-handle-timing-interceptor
   (pedestal.interceptor/interceptor

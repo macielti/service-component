@@ -14,6 +14,8 @@
             [service-component.core :as component.service]
             [service-component.interceptors :as interceptors]))
 
+(def test-state (atom nil))
+
 (def routes [["/test" :get [interceptors/http-request-in-handle-timing-interceptor
                             (fn [{{:keys [config]} :components}]
                               {:status 200
@@ -21,7 +23,8 @@
               :route-name :test]
              ["/schema-validation-interceptor-test" :post [(interceptors/schema-body-in-interceptor {:test                       schema/Str
                                                                                                      (schema/optional-key :type) schema/Keyword})
-                                                           (fn [_]
+                                                           (fn [{:keys [json-params]}]
+                                                             (reset! test-state json-params)
                                                              {:status 200
                                                               :body   {:test :schema-ok}})]
               :route-name :schema-validation-interceptor-test]])
@@ -46,28 +49,37 @@
                   (test/response-for service-fn :get "/test" :headers {"authorization" "Bearer test-token"}))))
 
     (testing "That we can't fetch the test endpoint without a valid schema"
+      (reset! test-state nil)
       (is (match? {:status 422
                    :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":{\"test\":\"Missing required key\"}}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test"
                                      :headers {"Content-Type" "application/json"}
                                      :body (json/encode {}))))
 
+      (reset! test-state nil)
       (is (match? {:status 422
                    :body   "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":\"The value must be a map, but was '' instead.\"}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test")))
 
+      (reset! test-state nil)
       (is (match? {:status 200
                    :body   "{\"test\":\"schema-ok\"}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test"
                                      :headers {"Content-Type" "application/json"}
                                      :body (json/encode {:test :ok}))))
+      (is (= {:test "ok"}
+             @test-state))
 
+      (reset! test-state nil)
       (is (match? {:status 200
                    :body   "{\"test\":\"schema-ok\"}"}
                   (test/response-for service-fn :post "/schema-validation-interceptor-test"
                                      :headers {"Content-Type" "application/json"}
                                      :body (json/encode {:test :ok
                                                          :type :simple-test})))))
+    (is (= {:test "ok"
+            :type :simple-test}
+           @test-state))
 
     (is (str/includes? (export/text-format prometheus-registry) "http_request_in_handle_timing_v2_sum{service=\"rango\",endpoint=\"test\",}"))
 

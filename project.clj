@@ -1,4 +1,4 @@
-(defproject net.clojars.macielti/service-component "3.4.2"
+(defproject net.clojars.macielti/service-component "4.4.2"
 
   :description "Service Component is a Pedestal service Integrant component"
 
@@ -7,7 +7,7 @@
   :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
             :url  "https://www.eclipse.org/legal/epl-2.0/"}
 
-  :dependencies [[org.clojure/clojure "1.12.0"]
+  :dependencies [[org.clojure/clojure "1.12.1"]
                  [io.pedestal/pedestal.service "0.7.2"]
                  [io.pedestal/pedestal.jetty "0.7.2"]
                  [io.pedestal/pedestal.error "0.7.2"]
@@ -21,13 +21,13 @@
                    :test-paths     ^:replace ["test/unit" "test/integration" "test/helpers"]
 
                    :plugins        [[lein-cloverage "1.2.4"]
-                                    [com.github.clojure-lsp/lein-clojure-lsp "1.4.15"]
+                                    [com.github.clojure-lsp/lein-clojure-lsp "2.0.9"]
                                     [com.github.liquidz/antq "RELEASE"]]
 
-                   :dependencies   [[net.clojars.macielti/common-clj "39.72.72"]
+                   :dependencies   [[net.clojars.macielti/common-clj "43.74.74"]
                                     [prismatic/schema "1.4.1"]
                                     [nubank/matcher-combinators "3.9.1"]
-                                    [com.taoensso/timbre "6.6.1"]
+                                    [com.taoensso/timbre "6.7.1"]
                                     [hashp "0.2.2"]]
 
                    :injections     [(require 'hashp.core)]
