@@ -6,7 +6,9 @@
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.interceptor :as pedestal.interceptor]
             [io.pedestal.interceptor.error :as error]
+            [schema.coerce :as coerce]
             [schema.core :as s]
+            [schema.utils]
             [service-component.error :as common-error])
   (:import (clojure.lang ExceptionInfo)))
 
@@ -41,13 +43,21 @@
 (defn schema-body-in-interceptor [schema]
   (pedestal.interceptor/interceptor {:name  ::schema-body-in-interceptor
                                      :enter (fn [{{:keys [json-params]} :request :as context}]
-                                              (try (s/validate schema json-params)
-                                                   (catch ExceptionInfo e
-                                                     (when (= (:type (ex-data e)) :schema.core/error)
-                                                       (common-error/http-friendly-exception 422
-                                                                                             "invalid-schema-in"
-                                                                                             "The system detected that the received data is invalid"
-                                                                                             (get-in (h/ex->err e) [:unknown :error])))))
+                                              (let [coercer-fn (coerce/coercer schema coerce/json-coercion-matcher)
+                                                    coercion-result (coercer-fn json-params)]
+                                                (if-not (schema.utils/error? coercion-result)
+                                                  (try (s/validate schema coercion-result)
+                                                       (catch ExceptionInfo e
+                                                         (when (= (:type (ex-data e)) :schema.core/error)
+                                                           (common-error/http-friendly-exception 422
+                                                                                                 "invalid-schema-in"
+                                                                                                 "The system detected that the received data is invalid"
+                                                                                                 (get-in (h/ex->err e) [:unknown :error])))))
+                                                  (common-error/http-friendly-exception 422
+                                                                                        "invalid-schema-in"
+                                                                                        "The system detected that the received data is invalid"
+                                                                                        (-> (schema.utils/error-val coercion-result)
+                                                                                            h/explain))))
                                               context)}))
 
 (def http-request-in-handle-timing-interceptor
