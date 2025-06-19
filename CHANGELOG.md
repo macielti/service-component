@@ -5,6 +5,12 @@ of [keepachangelog.com](http://keepachangelog.com/).
 
 ## [Unreleased]
 
+## 4.4.2 - 2025-06-19
+
+### Fixed
+
+- Fixed `schema-body-in-interceptor` interceptor to update the request body with the coerced schema value.
+
 ## 3.4.2 - 2025-06-17
 
 ### Added
