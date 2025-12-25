@@ -6,12 +6,17 @@ of [keepachangelog.com](http://keepachangelog.com/).
 ## 5.4.2 - 2025-12-25
 
 ### Changed
+
 - **Major Pedestal Upgrade**: Migrated from Pedestal 0.7.x to 0.8.x, adopting the new connector-based API.
-    - Refactored `service-component.core` to use `io.pedestal.connector` and `io.pedestal.http.jetty`, replacing the deprecated `io.pedestal.http` API.
-    - Migrated interceptors and test utilities to use modern namespaces like `io.pedestal.connector` and `io.pedestal.service.interceptors`.
-- **Error Handling**: Enhanced the error handler interceptor to guarantee JSON responses with the correct `Content-Type` header, ensuring consistent API error output.
+    - Refactored `service-component.core` to use `io.pedestal.connector` and `io.pedestal.http.jetty`, replacing the
+      deprecated `io.pedestal.http` API.
+    - Updated interceptors and test utilities to use modern namespaces like `io.pedestal.connector` and
+      `io.pedestal.service.interceptors`.
+- **Interceptors**: The default set of interceptors was updated to align with the new Pedestal 0.8 architecture and
+  improve error handling.
 
 ### Dependencies
+
 - Upgraded Pedestal to `0.8.1`.
 - Upgraded Clojure to `1.12.4`.
 - Upgraded Integrant to `1.0.1`.
