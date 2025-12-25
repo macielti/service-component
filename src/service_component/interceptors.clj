@@ -3,10 +3,8 @@
             [clojure.tools.logging :as log]
             [humanize.schema :as h]
             [iapetos.core :as prometheus]
-            [io.pedestal.http.body-params :as body-params]
             [io.pedestal.interceptor :as pedestal.interceptor]
             [io.pedestal.interceptor.error :as error]
-            [io.pedestal.service.interceptors :as pedestal.service.interceptors]
             [schema.coerce :as coerce]
             [schema.core :as s]
             [schema.utils]
@@ -37,12 +35,6 @@
    {:name  ::components-interceptor
     :enter (fn [context]
              (assoc-in context [:request :components] system-components))}))
-
-(defn default-interceptors [components]
-  [(body-params/body-params)
-   (components-interceptor components)
-   pedestal.service.interceptors/json-body
-   error-handler-interceptor])
 
 (defn schema-body-in-interceptor [schema]
   (pedestal.interceptor/interceptor {:name  ::schema-body-in-interceptor
