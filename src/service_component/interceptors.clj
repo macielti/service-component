@@ -1,11 +1,12 @@
 (ns service-component.interceptors
-  (:require [clojure.tools.logging :as log]
+  (:require [cheshire.core :as json]
+            [clojure.tools.logging :as log]
             [humanize.schema :as h]
             [iapetos.core :as prometheus]
-            [io.pedestal.http :as http]
             [io.pedestal.http.body-params :as body-params]
             [io.pedestal.interceptor :as pedestal.interceptor]
             [io.pedestal.interceptor.error :as error]
+            [io.pedestal.service.interceptors :as pedestal.service.interceptors]
             [schema.coerce :as coerce]
             [schema.core :as s]
             [schema.utils]
@@ -17,16 +18,19 @@
   (error/error-dispatch [ctx ex]
                         [{:exception-type :clojure.lang.ExceptionInfo}]
                         (let [{:keys [status error message detail]} (ex-data ex)]
-                          (assoc ctx :response {:status status
-                                                :body   {:error   error
-                                                         :message message
-                                                         :detail  detail}}))
+                          (assoc ctx :response {:status  status
+                                                :headers {"Content-Type" "application/json;charset=UTF-8"}
+                                                :body    (json/encode {:error   error
+                                                                       :message message
+                                                                       :detail  detail})}))
 
                         :else
                         (do (log/error ex)
-                            (assoc ctx :response {:status 500 :body {:error   "unexpected-server-error"
-                                                                     :message "Internal Server Error"
-                                                                     :detail  "Internal Server Error"}}))))
+                            (assoc ctx :response {:status  500
+                                                  :headers {"Content-Type" "application/json;charset=UTF-8"}
+                                                  :body    (json/encode {:error   "unexpected-server-error"
+                                                                         :message "Internal Server Error"
+                                                                         :detail  "Internal Server Error"})}))))
 
 (defn components-interceptor [system-components]
   (pedestal.interceptor/interceptor
@@ -37,7 +41,7 @@
 (defn default-interceptors [components]
   [(body-params/body-params)
    (components-interceptor components)
-   http/json-body
+   pedestal.service.interceptors/json-body
    error-handler-interceptor])
 
 (defn schema-body-in-interceptor [schema]
