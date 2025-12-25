@@ -10,9 +10,9 @@ dependencies to your project:
 
 ``` clojure
   [net.clojars.macielti/service-component "x.y.z"]
-  [io.pedestal/pedestal.service "0.7.2"]
-  [io.pedestal/pedestal.jetty "0.7.2"]
-  [io.pedestal/pedestal.error "0.7.2"]
+  [io.pedestal/pedestal.service "0.8.1"]
+  [io.pedestal/pedestal.jetty "0.8.1"]
+  [io.pedestal/pedestal.error "0.8.1"]
 ```
 
 ## License
