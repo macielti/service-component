@@ -9,6 +9,7 @@
 
   :dependencies [[org.clojure/clojure "1.12.4"]
                  [io.pedestal/pedestal.service "0.8.1"]
+                 [com.vodori/schema-conformer "0.1.2"]
                  [io.pedestal/pedestal.jetty "0.8.1"]
                  [io.pedestal/pedestal.error "0.8.1"]
                  [org.clojure/tools.logging "1.3.0"]

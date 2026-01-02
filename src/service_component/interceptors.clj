@@ -5,6 +5,7 @@
             [iapetos.core :as prometheus]
             [io.pedestal.interceptor :as pedestal.interceptor]
             [io.pedestal.interceptor.error :as error]
+            [schema-conformer.core :as conformer]
             [schema.coerce :as coerce]
             [schema.core :as s]
             [schema.utils]
@@ -37,24 +38,24 @@
              (assoc-in context [:request :components] system-components))}))
 
 (defn schema-body-in-interceptor [schema]
-  (pedestal.interceptor/interceptor {:name  ::schema-body-in-interceptor
-                                     :enter (fn [{{:keys [json-params]} :request :as context}]
-                                              (let [coercer-fn (coerce/coercer schema coerce/json-coercion-matcher)
-                                                    coercion-result (coercer-fn json-params)]
-                                                (if-not (schema.utils/error? coercion-result)
-                                                  (try (s/validate schema coercion-result)
-                                                       (catch ExceptionInfo e
-                                                         (when (= (:type (ex-data e)) :schema.core/error)
-                                                           (common-error/http-friendly-exception 422
-                                                                                                 "invalid-schema-in"
-                                                                                                 "The system detected that the received data is invalid"
-                                                                                                 (get-in (h/ex->err e) [:unknown :error])))))
-                                                  (common-error/http-friendly-exception 422
-                                                                                        "invalid-schema-in"
-                                                                                        "The system detected that the received data is invalid"
-                                                                                        (-> (schema.utils/error-val coercion-result)
-                                                                                            h/explain)))
-                                                (assoc-in context [:request :json-params] coercion-result)))}))
+  (pedestal.interceptor/interceptor
+   {:name  ::schema-body-in-interceptor
+    :enter (fn [{{:keys [json-params]} :request :as context}]
+             (let [coercer-fn (coerce/coercer schema coerce/json-coercion-matcher)
+                   coercion-result (coercer-fn json-params)]
+               (if-not (schema.utils/error? coercion-result)
+                 (try (s/validate schema coercion-result)
+                      (catch ExceptionInfo e
+                        (when (= (:type (ex-data e)) :schema.core/error)
+                          (common-error/http-friendly-exception 422
+                                                                "invalid-schema-in"
+                                                                "The system detected that the received data is invalid"
+                                                                (get-in (h/ex->err e) [:unknown :error])))))
+                 (common-error/http-friendly-exception 422
+                                                       "invalid-schema-in"
+                                                       "The system detected that the received data is invalid"
+                                                       (-> (schema.utils/error-val coercion-result) h/explain)))
+               (assoc-in context [:request :json-params] coercion-result)))}))
 
 (def http-request-in-handle-timing-interceptor
   (pedestal.interceptor/interceptor
@@ -72,3 +73,15 @@
                                     :endpoint (name route-name)}
                                    elapsed-ms)
                (dissoc context ::start-ms)))}))
+
+(defn query-params-schema [schema]
+  (pedestal.interceptor/interceptor
+   {:name  ::query-params-schema
+    :enter (fn [{{:keys [query-params]} :request :as context}]
+             (let [query-params' (conformer/conform schema query-params)]
+               (when (schema.utils/error? query-params')
+                 (common-error/http-friendly-exception 422
+                                                       "invalid-payload-for-query-params"
+                                                       "The system detected that the received data is invalid."
+                                                       (-> query-params' schema.utils/error-val str)))
+               (assoc-in context [:request :query-params] query-params')))}))
