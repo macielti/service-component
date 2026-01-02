@@ -1,14 +1,15 @@
 (ns service-component.interceptors
   (:require [cheshire.core :as json]
             [clojure.tools.logging :as log]
+            [common-clj.time.parser.core :as time.parser]
             [humanize.schema :as h]
             [iapetos.core :as prometheus]
             [io.pedestal.interceptor :as pedestal.interceptor]
             [io.pedestal.interceptor.error :as error]
-            [schema-conformer.core :as conformer]
             [schema.coerce :as coerce]
             [schema.utils]
-            [service-component.error :as common-error]))
+            [service-component.error :as common-error])
+  (:import (java.time LocalDate)))
 
 (def error-handler-interceptor
   (error/error-dispatch [ctx ex]
@@ -64,14 +65,22 @@
                                    elapsed-ms)
                (dissoc context ::start-ms)))}))
 
+(def ^:private coercions
+  {LocalDate (fn [input] (time.parser/str->local-date "yyyy-MM-dd" input))})
+
+(defn ^:private coercions-matcher
+  [schema]
+  (coercions schema))
+
 (defn query-params-schema [schema]
   (pedestal.interceptor/interceptor
    {:name  ::query-params-schema
     :enter (fn [{{:keys [query-params]} :request :as context}]
-             (let [query-params' (conformer/conform schema query-params)]
+             (let [coercer-fn (coerce/coercer schema coercions-matcher)
+                   query-params' (coercer-fn (or query-params {}))]
                (when (schema.utils/error? query-params')
                  (common-error/http-friendly-exception 422
                                                        "invalid-payload-for-query-params"
                                                        "The system detected that the received data is invalid."
-                                                       (-> query-params' schema.utils/error-val str)))
+                                                       (-> (schema.utils/error-val query-params') h/explain)))
                (assoc-in context [:request :query-params] query-params')))}))

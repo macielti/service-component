@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 6.4.3 - 2026-01-02
+
+### Added
+
+- Add to interceptor `query-params-schema` coercion support from `String` to `LocalDate`.
+
 ## 6.4.2 - 2026-01-02
 
 ### Changed
