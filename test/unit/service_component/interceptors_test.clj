@@ -1,5 +1,5 @@
 (ns service-component.interceptors-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.test :refer [is]]
             [io.pedestal.interceptor.chain :as chain]
             [matcher-combinators.test :refer [match?]]
             [schema.core]

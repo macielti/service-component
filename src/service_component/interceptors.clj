@@ -10,7 +10,6 @@
             [schema.utils]
             [service-component.error :as common-error]))
 
-#_{:clj-kondo/ignore [:unresolved-symbol]}
 (def error-handler-interceptor
   (error/error-dispatch [ctx ex]
                         [{:exception-type :clojure.lang.ExceptionInfo}]
