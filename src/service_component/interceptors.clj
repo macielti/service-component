@@ -7,7 +7,6 @@
             [io.pedestal.interceptor :as pedestal.interceptor]
             [io.pedestal.interceptor.error :as error]
             [schema.coerce :as coerce]
-            [schema.core :as s]
             [schema.utils]
             [service-component.error :as common-error])
   (:import (java.time LocalDate)))
