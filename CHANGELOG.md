@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 6.4.2 - 2026-01-02
+
+### Changed
+
+- Renamed interceptor from `schema-body-in-interceptor` to `wire-in-body-schema`.
+
+### Added
+
+- Implement interceptor `query-params-schema` to coerce query params and validate against expected schema.
+
 ## 5.4.2 - 2025-12-25
 
 ### Changed

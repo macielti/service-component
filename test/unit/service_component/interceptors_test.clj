@@ -10,6 +10,9 @@
 (schema.core/defschema QueryParams
   {:hello schema.core/Str})
 
+(schema.core/defschema QueryParamsOptionalKey
+  {(schema.core/optional-key :hello) schema.core/Str})
+
 (s/deftest query-params-schema-test
   (let [ex (is (thrown? ExceptionInfo (chain/execute {} [(interceptors/query-params-schema QueryParams)])))]
     (is (match? {:status  422
@@ -22,4 +25,7 @@
               (chain/execute {:request {:query-params {:hello "world"}}} [(interceptors/query-params-schema QueryParams)])))
 
   (is (match? {:request {:query-params {:hello "world"}}}
-              (chain/execute {:request {:query-params {:hello :world}}} [(interceptors/query-params-schema QueryParams)]))))
+              (chain/execute {:request {:query-params {:hello :world}}} [(interceptors/query-params-schema QueryParams)])))
+
+  (is (match? {:request {:query-params {}}}
+              (chain/execute {:request {}} [(interceptors/query-params-schema QueryParamsOptionalKey)]))))
