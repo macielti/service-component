@@ -23,8 +23,8 @@
                               {:status 200
                                :body   config})]
               :route-name :test]
-             ["/schema-validation-interceptor-test" :post [(interceptors/schema-body-in-interceptor {:test                       schema/Str
-                                                                                                     (schema/optional-key :type) schema/Keyword})
+             ["/schema-validation-interceptor-test" :post [(interceptors/wire-in-body-schema {:test                       schema/Str
+                                                                                              (schema/optional-key :type) schema/Keyword})
                                                            pedestal.service.interceptors/json-body
                                                            (fn [{:keys [json-params]}]
                                                              (reset! test-state json-params)

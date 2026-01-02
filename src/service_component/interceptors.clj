@@ -7,10 +7,8 @@
             [io.pedestal.interceptor.error :as error]
             [schema-conformer.core :as conformer]
             [schema.coerce :as coerce]
-            [schema.core :as s]
             [schema.utils]
-            [service-component.error :as common-error])
-  (:import (clojure.lang ExceptionInfo)))
+            [service-component.error :as common-error]))
 
 #_{:clj-kondo/ignore [:unresolved-symbol]}
 (def error-handler-interceptor
@@ -37,20 +35,13 @@
     :enter (fn [context]
              (assoc-in context [:request :components] system-components))}))
 
-(defn schema-body-in-interceptor [schema]
+(defn wire-in-body-schema [schema]
   (pedestal.interceptor/interceptor
    {:name  ::schema-body-in-interceptor
     :enter (fn [{{:keys [json-params]} :request :as context}]
              (let [coercer-fn (coerce/coercer schema coerce/json-coercion-matcher)
                    coercion-result (coercer-fn json-params)]
-               (if-not (schema.utils/error? coercion-result)
-                 (try (s/validate schema coercion-result)
-                      (catch ExceptionInfo e
-                        (when (= (:type (ex-data e)) :schema.core/error)
-                          (common-error/http-friendly-exception 422
-                                                                "invalid-schema-in"
-                                                                "The system detected that the received data is invalid"
-                                                                (get-in (h/ex->err e) [:unknown :error])))))
+               (when (schema.utils/error? coercion-result)
                  (common-error/http-friendly-exception 422
                                                        "invalid-schema-in"
                                                        "The system detected that the received data is invalid"
