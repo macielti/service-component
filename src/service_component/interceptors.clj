@@ -67,8 +67,7 @@
                (dissoc context ::start-ms)))}))
 
 (def ^:private coercions
-  {LocalDate (fn [input] (time.parser/str->local-date "yyyy-MM-dd" input))
-   s/Keyword (fn [input] (keyword #p input))})
+  {LocalDate (fn [input] (time.parser/str->local-date "yyyy-MM-dd" input))})
 
 (defn ^:private coercions-matcher
   [schema]
