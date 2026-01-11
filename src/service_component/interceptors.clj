@@ -7,6 +7,7 @@
             [io.pedestal.interceptor :as pedestal.interceptor]
             [io.pedestal.interceptor.error :as error]
             [schema.coerce :as coerce]
+            [schema.core]
             [schema.utils]
             [service-component.error :as common-error])
   (:import (java.time LocalDate)))
@@ -35,17 +36,24 @@
     :enter (fn [context]
              (assoc-in context [:request :components] system-components))}))
 
+(defn ^:private json-matcher
+  [schema]
+  (or (when (and (instance? schema.core.EqSchema schema)
+                 (keyword? (:v schema)))
+        (fn [x] (if (string? x) (keyword x) x)))
+      (coerce/json-coercion-matcher schema)))
+
 (defn wire-in-body-schema [schema]
   (pedestal.interceptor/interceptor
    {:name  ::schema-body-in-interceptor
     :enter (fn [{{:keys [json-params]} :request :as context}]
-             (let [coercer-fn (coerce/coercer schema coerce/json-coercion-matcher)
+             (let [coercer-fn (coerce/coercer schema json-matcher)
                    coercion-result (coercer-fn json-params)]
                (when (schema.utils/error? coercion-result)
                  (common-error/http-friendly-exception 422
-                                                       "invalid-schema-in"
-                                                       "The system detected that the received data is invalid"
-                                                       (-> (schema.utils/error-val coercion-result) h/explain)))
+                                                       "invalid-request-body-payload"
+                                                       "The system detected that the received data is invalid."
+                                                       (-> (schema.utils/error-val coercion-result) h/explain str)))
                (assoc-in context [:request :json-params] coercion-result)))}))
 
 (def http-request-in-handle-timing-interceptor
