@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. This change log follows the conventions
 of [keepachangelog.com](http://keepachangelog.com/).
 
+## 7.4.3 - 2026-01-11
+
+### Changed
+
+- Breaking Change: Error handling for request body validation has been updated.
+    - The error code for schema validation failures is now invalid-request-body-payload.
+    - Error messages for invalid request bodies are improved for clarity.
+    - Error details in responses are now consistently stringified.
+- Schema Coercion: String values in JSON request bodies are now automatically coerced to keywords when the schema
+  expects a keyword, improving compatibility with EqSchema.
+
 ## 6.4.3 - 2026-01-02
 
 ### Added
