@@ -37,9 +37,15 @@
 (schema.core/defschema EqKeywordSchema
   {:type (schema.core/eq :hello-world)})
 
+(schema.core/defschema ConditionalEqKeywordSchema
+  (schema.core/conditional #(= (:type #p %) :hello-world) EqKeywordSchema))
+
 (s/deftest wire-in-body-schema-test
   (is (match? {:request {:json-params {:type :hello-world}}}
               (chain/execute {:request {:json-params {:type "hello-world"}}} [(interceptors/wire-in-body-schema EqKeywordSchema)])))
+
+  (is (match? {:request {:json-params {:type :hello-world}}}
+              (chain/execute {:request {:json-params {:type "hello-world"}}} [(interceptors/wire-in-body-schema ConditionalEqKeywordSchema)])))
 
   (let [ex (is (thrown? ExceptionInfo (chain/execute {:request {:json-params {:type "test"}}} [(interceptors/wire-in-body-schema EqKeywordSchema)])))]
     (is (match? {:status  422

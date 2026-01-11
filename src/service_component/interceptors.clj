@@ -38,9 +38,31 @@
 
 (defn ^:private json-matcher
   [schema]
-  (or (when (and (instance? schema.core.EqSchema schema)
-                 (keyword? (:v schema)))
-        (fn [x] (if (string? x) (keyword x) x)))
+  (or (when (instance? schema.core.EqSchema schema)
+        (when (keyword? (:v schema))
+          (fn [x] (if (string? x) (keyword x) x))))
+
+      (when (instance? schema.core.ConditionalSchema schema)
+        (fn [data]
+          (let [preds-and-schemas-vec (:preds-and-schemas schema)
+                ;; Find the schema that corresponds to the first matching predicate
+                schema-to-use (loop [ps-pairs (partition-all 2 preds-and-schemas-vec)]
+                                (if-let [[p s] (first ps-pairs)]
+                                  (cond
+                                    ;; Case 1: The 'else' clause. `s` is nil, so `p` is the schema.
+                                    (nil? s) p
+                                    ;; Case 2: The predicate `p` matches the data. Return the schema `s`.
+                                    (p data) s
+                                    ;; Case 3: No match, try the next pair.
+                                    :else (recur (next ps-pairs)))
+                                  ;; Default case if loop finishes (shouldn't happen with valid s/conditional)
+                                  nil))]
+            ;; If we found a schema, create a coercer for it and run it.
+            (if schema-to-use
+              ((coerce/coercer schema-to-use json-matcher) data)
+              ;; Otherwise, return the data as-is.
+              data))))
+
       (coerce/json-coercion-matcher schema)))
 
 (defn wire-in-body-schema [schema]
