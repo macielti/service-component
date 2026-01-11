@@ -56,14 +56,14 @@
       (reset! test-state nil)
       (is (match? {:status  422
                    :headers {"Content-Type" "application/json;charset=UTF-8"}
-                   :body    "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":{\"test\":\"Missing required key\"}}"}
+                   :body    "{\"error\":\"invalid-request-body-payload\",\"message\":\"The system detected that the received data is invalid.\",\"detail\":\"{:test \\\"Missing required key\\\"}\"}"}
                   (test/response-for connector :post "/schema-validation-interceptor-test"
                                      :headers {:content-type "application/json"}
                                      :body (json/encode {}))))
 
       (is (match? {:status  422
                    :headers {"Content-Type" "application/json;charset=UTF-8"}
-                   :body    "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":{\"hello\":\"Invalid key.\",\"test\":\"Missing required key\"}}"}
+                   :body    "{\"error\":\"invalid-request-body-payload\",\"message\":\"The system detected that the received data is invalid.\",\"detail\":\"{:hello \\\"Invalid key.\\\", :test \\\"Missing required key\\\"}\"}"}
                   (test/response-for connector :post "/schema-validation-interceptor-test"
                                      :headers {:content-type "application/json"}
                                      :body (json/encode {:hello :world}))))
@@ -71,7 +71,7 @@
       (reset! test-state nil)
       (is (match? {:status  422
                    :headers {"Content-Type" "application/json;charset=UTF-8"}
-                   :body    "{\"error\":\"invalid-schema-in\",\"message\":\"The system detected that the received data is invalid\",\"detail\":\"The value must be a map, but was '' instead.\"}"}
+                   :body    "{\"error\":\"invalid-request-body-payload\",\"message\":\"The system detected that the received data is invalid.\",\"detail\":\"The value must be a map, but was '' instead.\"}"}
                   (test/response-for connector :post "/schema-validation-interceptor-test")))
 
       (reset! test-state nil)

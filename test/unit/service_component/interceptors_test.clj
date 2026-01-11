@@ -33,3 +33,17 @@
 
   (is (match? {:request {:query-params {:reference-date (LocalDate/of 1998 12 26)}}}
               (chain/execute {:request {:query-params {:reference-date "1998-12-26"}}} [(interceptors/query-params-schema QueryParamsWithDate)]))))
+
+(schema.core/defschema EqKeywordSchema
+  {:type (schema.core/eq :hello-world)})
+
+(s/deftest wire-in-body-schema-test
+  (is (match? {:request {:json-params {:type :hello-world}}}
+              (chain/execute {:request {:json-params {:type "hello-world"}}} [(interceptors/wire-in-body-schema EqKeywordSchema)])))
+
+  (let [ex (is (thrown? ExceptionInfo (chain/execute {:request {:json-params {:type "test"}}} [(interceptors/wire-in-body-schema EqKeywordSchema)])))]
+    (is (match? {:status  422
+                 :error   "invalid-request-body-payload"
+                 :message "The system detected that the received data is invalid."
+                 :detail  "{:type [not [= :hello-world :test]]}"}
+                (ex-data ex)))))
